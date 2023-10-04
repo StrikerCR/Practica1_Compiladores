@@ -45,11 +45,9 @@ public class Scanner {
                     if(Character.isLetter(c)){
                         estado = 9;
                         lexema += c;
-                    }
-                    else if(Character.isDigit(c)){
+                    } else if(Character.isDigit(c)){
                         estado = 11;
                         lexema += c;
-
                         /*while(Character.isDigit(c)){
                             lexema += c;
                             i++;
@@ -65,7 +63,7 @@ public class Scanner {
                     break;
 
                 case 9:
-                    if(Character.isLetter(c) || Character.isDigit(c)){
+                    if(Character.isLetter(c) || Character.isDigit(c) || c == '_'){
                         estado = 9;
                         lexema += c;
                     }
@@ -93,12 +91,15 @@ public class Scanner {
                         lexema += c;
                     }
                     else if(c == '.'){
-
+                        estado = 17;
+                        lexema += c;
                     }
                     else if(c == 'E'){
-
+                        estado = 18;
+                        lexema += c;
                     }
                     else{
+                        // Vamos a crear el Token de un número entero
                         Token t = new Token(TipoToken.NUMBER, lexema, Integer.valueOf(lexema));
                         tokens.add(t);
 
@@ -106,6 +107,45 @@ public class Scanner {
                         lexema = "";
                     }
                     break;
+                case 17:
+                    if(Character.isDigit(c)){
+                        estado = 17;
+                        lexema += c;
+                    } else if(c == 'E'){
+                        estado = 18;
+                        lexema += c;
+                    } else{
+                        // Vamos a crear el Token de un número decimal
+                        Token t = new Token(TipoToken.NUMBER, lexema, Double.valueOf(lexema));
+                        tokens.add(t);
+
+                        estado = 0;
+                        lexema = "";
+                    }
+                break;
+                case 18:
+                    if(c == '+' || c == '-'){
+                        estado = 20;
+                        lexema += c;
+                    }
+                    else if(Character.isDigit(c)){
+                        estado = 20;
+                        lexema += c;
+                    }
+                break;
+                case 20:
+                    if(Character.isDigit(c)){
+                        estado = 20;
+                        lexema += c;
+                    } else{
+                        // Vamos a crear el Token de un número exponencial
+                        Token t = new Token(TipoToken.NUMBER, lexema, lexema);
+                        tokens.add(t);
+
+                        estado = 0;
+                        lexema = "";
+                    }
+                break;
             }
         }
 
