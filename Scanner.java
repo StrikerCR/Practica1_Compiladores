@@ -139,7 +139,7 @@ public class Scanner {
                         lexema += c;
                     } else{
                         // Vamos a crear el Token de un número exponencial
-                        Token t = new Token(TipoToken.NUMBER, lexema, lexema);
+                        Token t = new Token(TipoToken.NUMBER, lexema, Double.valueOf(lexema));
                         tokens.add(t);
 
                         estado = 0;
