@@ -64,10 +64,86 @@ public class Scanner {
                     } else if(c == '/'){
                         estado = 26;
                         //lexema += c;
+                    } else if(c == '>'){
+                        estado = 1;
+                        lexema +=c;
+                    } else if(c == '<'){
+                        estado = 4;
+                        lexema +=c;
+                    } else if(c == '='){
+                        estado = 7;
+                        lexema +=c;
+                    } else if(c == '!'){
+                        estado = 10;
+                        lexema +=c;
+                    } else if(c == '"'){
+                        estado = 24;
+                        lexema +=c;
                     }
 
                     break;
-
+                    case 24:
+                    /*if(c == 10){
+                        Interprete.error(1, lexema, "No se cerro la cadena");
+                        return tokens;
+                    }else */if(c == '"'){
+                        lexema +=c;
+                        Token t = new Token(TipoToken.STRING, lexema);
+                        tokens.add(t);
+                        estado = 0;
+                        lexema = "";
+                    }else{
+                        lexema +=c;
+                    }
+                    break;
+                case 1:
+                    if(c == '='){
+                        lexema +=c;
+                        Token t = new Token(TipoToken.GREATER_EQUAL, lexema);
+                        tokens.add(t);
+                    }else{
+                        Token t = new Token(TipoToken.GREATER, lexema);
+                        tokens.add(t);
+                        i--;
+                    } estado = 0;
+                    lexema = "";
+                    break;
+                case 4:
+                    if(c == '='){
+                        lexema +=c;
+                        Token t = new Token(TipoToken.LESS_EQUAL, lexema);
+                        tokens.add(t);
+                    }else{
+                        Token t = new Token(TipoToken.LESS, lexema);
+                        tokens.add(t);
+                        i--;
+                    } estado = 0;
+                    lexema = "";
+                    break;
+                case 7:
+                    if(c == '='){
+                        lexema +=c;
+                        Token t = new Token(TipoToken.EQUAL_EQUAL, lexema);
+                        tokens.add(t);
+                    }else{
+                        Token t = new Token(TipoToken.EQUAL, lexema);
+                        tokens.add(t);
+                        i--;
+                    } estado = 0;
+                    lexema = "";
+                    break;
+                case 10:
+                    if(c == '='){
+                        lexema +=c;
+                        Token t = new Token(TipoToken.BANG_EQUAL, lexema);
+                        tokens.add(t);
+                    }else{
+                        Token t = new Token(TipoToken.BANG, lexema);
+                        tokens.add(t);
+                        i--;
+                    } estado = 0;
+                    lexema = "";
+                    break;
                 case 9:
                     if(Character.isLetter(c) || Character.isDigit(c) || c == '_'){
                         estado = 9;
