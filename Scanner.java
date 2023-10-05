@@ -1,7 +1,10 @@
+import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.lang.model.type.NullType;
 
 public class Scanner {
 
@@ -58,6 +61,9 @@ public class Scanner {
                         estado = 0;
                         tokens.add(t);
                         */
+                    } else if(c == '/'){
+                        estado = 26;
+                        //lexema += c;
                     }
 
                     break;
@@ -142,6 +148,73 @@ public class Scanner {
                         Token t = new Token(TipoToken.NUMBER, lexema, lexema);
                         tokens.add(t);
 
+                        estado = 0;
+                        lexema = "";
+                    }
+                break;
+                case 26:
+                    //Comprobando si es un comentario 
+                    if(c == '/'){
+                        estado = 30;
+                    } else if(c == '*'){
+                        estado = 27;
+                    }else{
+                        //return SLASH
+                        //Preguntar a que se refiere con esto
+                        lexema = "/";
+                        Token t = new Token(TipoToken.SLASH, lexema);
+                        tokens.add(t);
+                        
+                        estado = 0;
+                        lexema = "";
+                    }
+                break;
+                case 27:
+                    if(c == '*'){
+                        estado = 28;
+                    } else if(Character.isLetter(c) || Character.isDigit(c) ){
+                        estado = 27;
+                    }else{
+                        if(i+1== source.length()){
+                            //No hay cierre de comentario 
+                            Interprete.error(i, "El  comentario multilíena no tiene cierre...");
+                            estado = 0;
+                        }else{
+                            estado = 27;
+                        }
+                        
+                    }
+                break;
+                
+                case 28: 
+                   //Comprobando si es un comentario multilinea 
+                    if(c == '*'){
+                        estado = 28;
+                    } else if(c == '/'){
+                        //Fin comentario multilinea, NO GENERA TOKEN
+                        estado = 0;
+                        lexema = "";
+                    } else if(Character.isLetter(c) || Character.isDigit(c) ){
+                        estado = 27;
+                    }else{
+                        //No hay cierre del comentario multilinea
+                        //Caso /*Hola *
+                        if(i+1== source.length()){
+                            //No hay cierre de comentario 
+                            Interprete.error(i, "El comentario multilínea no tiene cierre");
+                            estado = 0;
+                        }else{
+                            estado = 27;
+                        }
+                    }
+                break;
+
+                case 30:
+                    //Comentario de una sola línea
+                    if(Character.isLetter(c) || Character.isDigit(c) || c == ' '){
+                        estado = 30;
+                    }else if(c == '\n'){
+                        //Fin de comentario, NO GENERA TOKEN
                         estado = 0;
                         lexema = "";
                     }
