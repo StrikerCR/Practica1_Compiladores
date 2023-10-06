@@ -131,12 +131,13 @@ public class Scanner {
 
                     break;
                     case 24:
-                    /*if(c == 10){
-                        Interprete.error(1, lexema, "No se cerro la cadena");
-                        return tokens;
-                    }else */if(c == '"'){
+                    if(c == '\n'){
+                        Interprete.error(cont+1, "No se cerr\u00f3 la cadena");
+                        estado = 0;
+                        lexema = "";
+                    }else if(c == '"'){
                         lexema +=c;
-                        Token t = new Token(TipoToken.STRING, lexema);
+                        Token t = new Token(TipoToken.STRING, lexema, lexema.replace('"', Character.MIN_VALUE));
                         tokens.add(t);
                         estado = 0;
                         lexema = "";
