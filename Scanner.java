@@ -38,6 +38,7 @@ public class Scanner {
     public List<Token> scan() throws Exception {
         String lexema = "";
         int estado = 0;
+        int cont = 1;
         char c;
 
         for(int i=0; i<source.length(); i++){
@@ -79,7 +80,54 @@ public class Scanner {
                     } else if(c == '"'){
                         estado = 24;
                         lexema +=c;
+                    }else if( c == '(' || c == ')' || c == '{' || c == '}' || c == ',' || c == '.' || c == '-' || c == ';' || c =='*' ){
+                        Token t;
+                        lexema += c;
+                        switch(c){
+                            case '(':
+                                t = new Token(TipoToken.LEFT_PAREN, lexema);
+                                tokens.add(t);
+                            break;
+                            case ')':
+                                t = new Token(TipoToken.RIGHT_PAREN, lexema);
+                                tokens.add(t);
+                            break;
+                            case '{':
+                                t = new Token(TipoToken.LEFT_BRACE, lexema);
+                                tokens.add(t);
+                            break;
+                            case '}':
+                                t = new Token(TipoToken.RIGHT_BRACE, lexema);
+                                tokens.add(t);
+                            break;
+                            case ',':
+                                t = new Token(TipoToken.COMMA, lexema);
+                                tokens.add(t);
+                            break;
+                            case '.':
+                                t = new Token(TipoToken.DOT, lexema);
+                                tokens.add(t);
+                            break;
+                            case '-':
+                                t = new Token(TipoToken.MINUS, lexema);
+                                tokens.add(t);
+                            break;
+                            case ';':
+                                t = new Token(TipoToken.SEMICOLON, lexema);
+                                tokens.add(t);
+                            break;
+                            case '*':
+                                t = new Token(TipoToken.STAR, lexema);
+                                tokens.add(t);
+                            break;
+                            
+                        }
+                        estado = 0;
+                        lexema = "";
+                    }else if(c == '\n'){
+                        cont++;
                     }
+
 
                     break;
                     case 24:
@@ -253,7 +301,7 @@ public class Scanner {
                     }else{
                         if(i+1== source.length()){
                             //No hay cierre de comentario 
-                            Interprete.error(i, "El  comentario multilíena no tiene cierre...");
+                            Interprete.error(cont, "El  comentario multilíena no tiene cierre...");
                             estado = 0;
                         }else{
                             estado = 27;
@@ -277,7 +325,7 @@ public class Scanner {
                         //Caso /*Hola *
                         if(i+1== source.length()){
                             //No hay cierre de comentario 
-                            Interprete.error(i, "El comentario multilínea no tiene cierre");
+                            Interprete.error(cont, "El comentario multilínea no tiene cierre");
                             estado = 0;
                         }else{
                             estado = 27;
