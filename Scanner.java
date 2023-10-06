@@ -46,6 +46,7 @@ public class Scanner {
 
         for(int i=0; i<source.length(); i++){
             c = source.charAt(i);
+            if(c == '\n') cont++;
 
             switch (estado){
                 case 0:
@@ -127,15 +128,12 @@ public class Scanner {
                         }
                         estado = 0;
                         lexema = "";
-                    }else if(c == '\n'){
-                        cont++;
                     }
 
-
                     break;
-                    case 24:
+                case 24:
                     if(c == '\n'){
-                        Interprete.error(cont+1, "No se cerr\u00f3 la cadena");
+                        Interprete.error(cont-1, "No se cerr\u00f3 la cadena");
                         estado = 0;
                         lexema = "";
                     }else if(c == '"'){
