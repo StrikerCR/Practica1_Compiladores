@@ -3,6 +3,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 
 import javax.lang.model.type.NullType;
 
@@ -39,6 +42,7 @@ public class Scanner {
         String lexema = "";
         int estado = 0;
         char c;
+        int cont = 1;
 
         for(int i=0; i<source.length(); i++){
             c = source.charAt(i);
@@ -64,6 +68,9 @@ public class Scanner {
                     } else if(c == '/'){
                         estado = 26;
                         //lexema += c;
+                    } else if(c == '\n'){
+                        cont++;
+                        System.out.println("hola");
                     }
 
                     break;
@@ -177,7 +184,7 @@ public class Scanner {
                     }else{
                         if(i+1== source.length()){
                             //No hay cierre de comentario 
-                            Interprete.error(i, "El  comentario multilíena no tiene cierre...");
+                            Interprete.error(cont, "El  comentario multilíena no tiene cierre...");
                             estado = 0;
                         }else{
                             estado = 27;
@@ -201,7 +208,7 @@ public class Scanner {
                         //Caso /*Hola *
                         if(i+1== source.length()){
                             //No hay cierre de comentario 
-                            Interprete.error(i, "El comentario multilínea no tiene cierre");
+                            Interprete.error(cont, "El comentario multilínea no tiene cierre");
                             estado = 0;
                         }else{
                             estado = 27;
