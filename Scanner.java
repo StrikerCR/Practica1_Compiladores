@@ -64,6 +64,11 @@ public class Scanner {
                         */
                     } else if(c == '/'){
                         estado = 26;
+                    }else if(c == '[' && c == ']'){
+                        Interprete.error(cont, "Hay un corchete");
+                        i = source.length();
+                    }else if(c == '\n'){
+                        cont++;
                     }else if( c == '(' || c == ')' || c == '{' || c == '}' || c == ',' || c == '.' || c == '-' || c == ';' || c =='*' ){
                         Token t;
                         lexema += c;
@@ -108,8 +113,6 @@ public class Scanner {
                         }
                         estado = 0;
                         lexema = "";
-                    }else if(c == '\n'){
-                        cont++;
                     }
 
 
