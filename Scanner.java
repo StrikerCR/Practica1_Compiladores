@@ -228,7 +228,7 @@ public class Scanner {
                         lexema += c;
                     }
                     else if(c == '.'){
-                        estado = 1;
+                        estado = 16;
                         lexema += c;
                     }
                     else if(c == 'E'){
@@ -253,7 +253,7 @@ public class Scanner {
 
                 case 16:
                     if(Character.isDigit(c)){
-                        estado = 17;
+                        estado = 16;
                         lexema += c;
                     } else if(c == 'E'){
                         estado = 18;
