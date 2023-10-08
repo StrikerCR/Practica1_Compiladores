@@ -69,7 +69,11 @@ public class Scanner {
                         */
                     } else if(c == '/'){
                         estado = 26;
-                        //lexema += c;
+                    }else if(c == '[' || c == ']'){
+                        Interprete.error(cont, "Hay un corchete");
+                        i = source.length();
+                    }else if(c == '\n'){
+                        cont++;
                     } else if(c == '>'){
                         estado = 1;
                         lexema +=c;
