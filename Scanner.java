@@ -69,11 +69,10 @@ public class Scanner {
                         */
                     } else if(c == '/'){
                         estado = 26;
-                    }else if(c == '[' || c == ']'){
+                    } else if(c == '[' || c == ']'){
                         Interprete.error(cont, "Hay un corchete");
                         i = source.length();
-                    }else if(c == '\n'){
-                        cont++;
+
                     } else if(c == '>'){
                         estado = 1;
                         lexema +=c;
@@ -162,7 +161,8 @@ public class Scanner {
                         Token t = new Token(TipoToken.LESS, lexema);
                         tokens.add(t);
                         i--;
-                    } estado = 0;
+                    } 
+                    estado = 0;
                     lexema = "";
                 break;
 
@@ -234,18 +234,17 @@ public class Scanner {
                     else if(c == 'E'){
                         estado = 18;
                         lexema += c;
-                    } else if(c == ';'){
-                        ban = true;
+                    } else if(c != ' '){
+                        // Vamos a crear el Token de un número decimal
+                        Token t = new Token(TipoToken.NUMBER, lexema, Integer.valueOf(lexema));
+                        tokens.add(t);
+                        estado = 0;
+                        lexema = "";
+                        i--;
                     } else {
                         // Vamos a crear el Token de un número entero
                         Token t = new Token(TipoToken.NUMBER, lexema, Integer.valueOf(lexema));
                         tokens.add(t);
-
-                        if(ban == true){
-                            t = new Token(TipoToken.SEMICOLON, ";");
-                            tokens.add(t);
-                            ban = false;
-                        }
 
                         estado = 0;
                         lexema = "";
@@ -259,6 +258,13 @@ public class Scanner {
                     } else if(c == 'E'){
                         estado = 18;
                         lexema += c;
+                    } else if(c != ' '){
+                        // Vamos a crear el Token de un número decimal
+                        Token t = new Token(TipoToken.NUMBER, lexema, Double.valueOf(lexema));
+                        tokens.add(t);
+                        estado = 0;
+                        lexema = "";
+                        i--;
                     } else if(c == '.'){
                         // Vamos a crear el Token de un número decimal
                         Token t = new Token(TipoToken.NUMBER, lexema, Double.valueOf(lexema));
@@ -312,7 +318,7 @@ public class Scanner {
                 case 24:
                     if(c == '\n'){
                         Interprete.error(cont-1, "No se cerr\u00f3 la cadena");
-                        estado = 0;
+                        i = source.length();
                         lexema = "";
                     }else if(c == '"'){
                         lexema +=c;
@@ -351,7 +357,7 @@ public class Scanner {
                     }else{
                         if(i+1== source.length()){
                             //No hay cierre de comentario 
-                            Interprete.error(cont, "El  comentario multilíena no tiene cierre...");
+                            Interprete.error(cont, "El  comentario multilíena no tiene cierre.");
                             estado = 0;
                         }else{
                             estado = 27;
