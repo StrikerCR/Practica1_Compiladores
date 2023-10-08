@@ -72,7 +72,6 @@ public class Scanner {
                     } else if(c == '[' || c == ']'){
                         Interprete.error(cont, "Hay un corchete");
                         i = source.length();
-
                     } else if(c == '>'){
                         estado = 1;
                         lexema +=c;
@@ -178,6 +177,20 @@ public class Scanner {
                     } estado = 0;
                     lexema = "";
                     break;
+
+                case 10:
+                    if(c == '='){
+                        lexema +=c;
+                        Token t = new Token(TipoToken.BANG_EQUAL, lexema);
+                        tokens.add(t);
+                    }else{
+                        Token t = new Token(TipoToken.BANG, lexema);
+                        tokens.add(t);
+                        i--;
+                    } estado = 0;
+                    lexema = "";
+                break;
+                
                 case 13:
                     if(Character.isLetter(c) || Character.isDigit(c) || c == '_'){
                         estado = 13;
@@ -207,19 +220,6 @@ public class Scanner {
                         lexema = "";
                         i--;
                     }
-                break;
-
-                case 10:
-                    if(c == '='){
-                        lexema +=c;
-                        Token t = new Token(TipoToken.BANG_EQUAL, lexema);
-                        tokens.add(t);
-                    }else{
-                        Token t = new Token(TipoToken.BANG, lexema);
-                        tokens.add(t);
-                        i--;
-                    } estado = 0;
-                    lexema = "";
                 break;
 
                 case 15:
