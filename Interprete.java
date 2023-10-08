@@ -52,6 +52,7 @@ public class Interprete {
             for(Token token : tokens){
                 System.out.println(token);
             }
+            System.out.println("--------------------------------------------------------");
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -72,6 +73,7 @@ public class Interprete {
         System.err.println(
                 "[linea " + linea + "] Error " + posicion + ": " + mensaje
         );
+        System.out.println("--------------------------------------------------------");
         existenErrores = true;
     }
 
