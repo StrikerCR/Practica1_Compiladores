@@ -52,10 +52,10 @@ public class Scanner {
             switch (estado){
                 case 0:
                     if(Character.isLetter(c)){
-                        estado = 9;
+                        estado = 13;
                         lexema += c;
                     } else if(Character.isDigit(c)){
-                        estado = 11;
+                        estado = 15;
                         lexema += c;
                         /*while(Character.isDigit(c)){
                             lexema += c;
@@ -178,9 +178,9 @@ public class Scanner {
                     } estado = 0;
                     lexema = "";
                     break;
-                case 9:
+                case 13:
                     if(Character.isLetter(c) || Character.isDigit(c) || c == '_'){
-                        estado = 9;
+                        estado = 13;
                         lexema += c;
                     } else if(c == ';'){
                         ban = true;
@@ -222,13 +222,13 @@ public class Scanner {
                     lexema = "";
                 break;
 
-                case 11:
+                case 15:
                     if(Character.isDigit(c)){
-                        estado = 11;
+                        estado = 15;
                         lexema += c;
                     }
                     else if(c == '.'){
-                        estado = 17;
+                        estado = 16;
                         lexema += c;
                     }
                     else if(c == 'E'){
@@ -251,9 +251,9 @@ public class Scanner {
                     }
                 break;
 
-                case 17:
+                case 16:
                     if(Character.isDigit(c)){
-                        estado = 17;
+                        estado = 16;
                         lexema += c;
                     } else if(c == 'E'){
                         estado = 18;
@@ -283,7 +283,7 @@ public class Scanner {
                     }
                 break;
 
-                /*case 18:
+                case 18:
                     if(c == '+' || c == '-'){
                         estado = 20;
                         lexema += c;
@@ -292,7 +292,7 @@ public class Scanner {
                         estado = 20;
                         lexema += c;
                     }
-                break;*/
+                break;
 
                 case 20:
                     if(Character.isDigit(c)){
@@ -319,6 +319,7 @@ public class Scanner {
                     if(c == '\n'){
                         Interprete.error(cont-1, "No se cerr\u00f3 la cadena");
                         i = source.length();
+                        estado = 0;
                         lexema = "";
                     }else if(c == '"'){
                         lexema +=c;
