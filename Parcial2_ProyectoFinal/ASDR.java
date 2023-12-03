@@ -42,7 +42,7 @@ public class ASDR implements Parser{
     private void FUN_DECL(){
         if(hayErrores) return;
         match(TipoToken.FUN);
-        //FUNCTION();
+        FUNCTION();
     }
 
     private void VAR_DECL(){
@@ -247,7 +247,7 @@ public class ASDR implements Parser{
 
     private void COMPARISON(){
         if(hayErrores) return;
-        //TERM();
+        TERM();
         COMPARISON_2();
     }
 
@@ -255,19 +255,19 @@ public class ASDR implements Parser{
         if(hayErrores) return;
         else if(preanalisis.tipo == TipoToken.GREATER){
             match(TipoToken.GREATER);
-            //TERM();
+            TERM();
             COMPARISON_2();
         } else if(preanalisis.tipo == TipoToken.GREATER_EQUAL){
             match(TipoToken.GREATER_EQUAL);
-            //TERM();
+            TERM();
             COMPARISON_2();
         } else if(preanalisis.tipo == TipoToken.LESS){
             match(TipoToken.LESS);
-            //TERM();
+            TERM();
             COMPARISON_2();
         } else if(preanalisis.tipo == TipoToken.LESS_EQUAL){
             match(TipoToken.LESS_EQUAL);
-            //TERM();
+            TERM();
             COMPARISON_2();
         }
     }
@@ -360,6 +360,62 @@ public class ASDR implements Parser{
         }
     }
     
+    private void FUNCTION(){
+        if(hayErrores) return;
+        match(TipoToken.IDENTIFIER);
+        match(TipoToken.LEFT_PAREN);
+        PARAMETERS_OPC();
+        match(TipoToken.RIGHT_PAREN);
+        BLOCK();
+    }
+
+    private void FUNCTIONS(){
+        if(hayErrores) return;
+        else if(preanalisis.tipo == TipoToken.FUN){
+            match(TipoToken.FUN);
+            FUNCTIONS();
+        }
+    }
+
+    private void PARAMETERS_OPC(){
+        if(hayErrores) return;
+        else if(preanalisis.tipo == TipoToken.IDENTIFIER){
+            match(TipoToken.IDENTIFIER);
+            FUNCTIONS();
+        }
+    }
+
+    private void PARAMETERS(){
+        match(TipoToken.IDENTIFIER);
+        PARAMETERS_2();
+    }
+
+    private void PARAMETERS_2(){
+        if(hayErrores) return;
+        else if(preanalisis.tipo == TipoToken.COMMA){
+            match(TipoToken.COMMA);
+            match(TipoToken.IDENTIFIER);
+            PARAMETERS_2();
+        }
+    }
+
+    private void ARGUMENTS_OPC(){
+        if(hayErrores) return;
+        else if(primeroEXPR_STMT(preanalisis.tipo)){
+            EXPRESSION();
+            ARGUMENTS();
+        }
+    }
+
+    private void ARGUMENTS(){
+        if(hayErrores) return;
+        else if(preanalisis.tipo == TipoToken.COMMA){
+            match(TipoToken.COMMA);
+            EXPRESSION();
+            ARGUMENTS();
+        }
+    }
+
     private void match(TipoToken tt){
         if(preanalisis.tipo == tt){
             i++;
