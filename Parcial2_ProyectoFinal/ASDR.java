@@ -42,7 +42,7 @@ public class ASDR implements Parser{
     private void FUN_DECL(){
         if(hayErrores) return;
         match(TipoToken.FUN);
-        //FUNCTION();
+        FUNCTION();
     }
 
     private void VAR_DECL(){
@@ -247,7 +247,7 @@ public class ASDR implements Parser{
 
     private void COMPARISON(){
         if(hayErrores) return;
-        //TERM();
+        TERM();
         COMPARISON_2();
     }
 
@@ -255,19 +255,19 @@ public class ASDR implements Parser{
         if(hayErrores) return;
         else if(preanalisis.tipo == TipoToken.GREATER){
             match(TipoToken.GREATER);
-            //TERM();
+            TERM();
             COMPARISON_2();
         } else if(preanalisis.tipo == TipoToken.GREATER_EQUAL){
             match(TipoToken.GREATER_EQUAL);
-            //TERM();
+            TERM();
             COMPARISON_2();
         } else if(preanalisis.tipo == TipoToken.LESS){
             match(TipoToken.LESS);
-            //TERM();
+            TERM();
             COMPARISON_2();
         } else if(preanalisis.tipo == TipoToken.LESS_EQUAL){
             match(TipoToken.LESS_EQUAL);
-            //TERM();
+            TERM();
             COMPARISON_2();
         }
     }
@@ -415,7 +415,7 @@ public class ASDR implements Parser{
             ARGUMENTS();
         }
     }
-    
+
     private void match(TipoToken tt){
         if(preanalisis.tipo == tt){
             i++;
