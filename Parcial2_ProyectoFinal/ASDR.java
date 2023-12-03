@@ -360,6 +360,62 @@ public class ASDR implements Parser{
         }
     }
     
+    private void FUNCTION(){
+        if(hayErrores) return;
+        match(TipoToken.IDENTIFIER);
+        match(TipoToken.LEFT_PAREN);
+        PARAMETERS_OPC();
+        match(TipoToken.RIGHT_PAREN);
+        BLOCK();
+    }
+
+    private void FUNCTIONS(){
+        if(hayErrores) return;
+        else if(preanalisis.tipo == TipoToken.FUN){
+            match(TipoToken.FUN);
+            FUNCTIONS();
+        }
+    }
+
+    private void PARAMETERS_OPC(){
+        if(hayErrores) return;
+        else if(preanalisis.tipo == TipoToken.IDENTIFIER){
+            match(TipoToken.IDENTIFIER);
+            FUNCTIONS();
+        }
+    }
+
+    private void PARAMETERS(){
+        match(TipoToken.IDENTIFIER);
+        PARAMETERS_2();
+    }
+
+    private void PARAMETERS_2(){
+        if(hayErrores) return;
+        else if(preanalisis.tipo == TipoToken.COMMA){
+            match(TipoToken.COMMA);
+            match(TipoToken.IDENTIFIER);
+            PARAMETERS_2();
+        }
+    }
+
+    private void ARGUMENTS_OPC(){
+        if(hayErrores) return;
+        else if(primeroEXPR_STMT(preanalisis.tipo)){
+            EXPRESSION();
+            ARGUMENTS();
+        }
+    }
+
+    private void ARGUMENTS(){
+        if(hayErrores) return;
+        else if(preanalisis.tipo == TipoToken.COMMA){
+            match(TipoToken.COMMA);
+            EXPRESSION();
+            ARGUMENTS();
+        }
+    }
+    
     private void match(TipoToken tt){
         if(preanalisis.tipo == tt){
             i++;
