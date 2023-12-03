@@ -177,7 +177,98 @@ public class ASDR implements Parser{
     }
 
     private void EXPRESSION(){
-        //ASSIGNMENT();
+        if(hayErrores) return;
+        ASSIGNMENT();
+    }
+
+    private void ASSIGNMENT(){
+        if(hayErrores) return;
+        LOGIC_OR();
+        ASSIGNMENT_OPC();
+    }
+    
+    private void ASSIGNMENT_OPC(){
+        if(hayErrores) return;
+        else if(preanalisis.tipo == TipoToken.EQUAL){
+            match(TipoToken.EQUAL);
+            EXPRESSION();
+        }
+        EXPRESSION();
+    }
+
+    private void LOGIC_OR(){
+        if(hayErrores) return;
+        LOGIC_AND();
+        LOGIC_OR_2();
+    }
+
+    private void LOGIC_OR_2(){
+        if(hayErrores) return;
+        else if(preanalisis.tipo == TipoToken.OR){
+            match(TipoToken.OR);
+            LOGIC_AND();
+            LOGIC_OR_2();
+        }
+    }
+
+    private void LOGIC_AND(){
+        if(hayErrores) return;
+        EQUALITY();
+        LOGIC_OR_2();
+    }
+
+    private void LOGIC_AND_2(){
+        if(hayErrores) return;
+        else if(preanalisis.tipo == TipoToken.AND){
+            match(TipoToken.AND);
+            EQUALITY();
+            LOGIC_OR_2();
+        }
+    }
+
+    private void EQUALITY(){
+        if(hayErrores) return;
+        COMPARISON();
+        EQUALITY_2();
+    }
+
+    private void EQUALITY_2(){
+        if(hayErrores) return;
+        else if(preanalisis.tipo == TipoToken.BANG_EQUAL){
+            match(TipoToken.BANG_EQUAL);
+            COMPARISON();
+            EQUALITY_2();
+        } else if(preanalisis.tipo == TipoToken.EQUAL_EQUAL){
+            match(TipoToken.EQUAL_EQUAL);
+            COMPARISON();
+            EQUALITY_2();
+        }
+    }
+
+    private void COMPARISON(){
+        if(hayErrores) return;
+        //TERM();
+        COMPARISON_2();
+    }
+
+    private void COMPARISON_2(){
+        if(hayErrores) return;
+        else if(preanalisis.tipo == TipoToken.GREATER){
+            match(TipoToken.GREATER);
+            //TERM();
+            COMPARISON_2();
+        } else if(preanalisis.tipo == TipoToken.GREATER_EQUAL){
+            match(TipoToken.GREATER_EQUAL);
+            //TERM();
+            COMPARISON_2();
+        } else if(preanalisis.tipo == TipoToken.LESS){
+            match(TipoToken.LESS);
+            //TERM();
+            COMPARISON_2();
+        } else if(preanalisis.tipo == TipoToken.LESS_EQUAL){
+            match(TipoToken.LESS_EQUAL);
+            //TERM();
+            COMPARISON_2();
     }
 
     private void match(TipoToken tt){
