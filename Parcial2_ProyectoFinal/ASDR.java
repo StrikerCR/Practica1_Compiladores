@@ -319,7 +319,7 @@ public class ASDR implements Parser{
             match(TipoToken.MINUS);
             UNARY();
         } else {
-            //CALL();
+            CALL();
         }
     }
 
@@ -335,7 +335,7 @@ public class ASDR implements Parser{
             match(TipoToken.LEFT_PAREN);
             ARGUMENTS_OPC();
             match(TipoToken.RIGHT_PAREN);
-            CALL_2();
+            //CALL_2(); No se usa, dicho por el profesor
         }
     }
     
