@@ -14,7 +14,7 @@ public class ASDR implements Parser{
     @Override
     public boolean parse(){
         PROGRAM();
-        if(preanalisis.tipo == TipoToken.EOF && !hayErrores){
+        if((i == tokens.size()) && !hayErrores){
             System.out.println("Consulta correcta");
             return true;
         }else System.out.println("Se encontraron errores");
@@ -26,6 +26,7 @@ public class ASDR implements Parser{
     }
 
     private void DECLARATION(){
+        System.out.println("DECLARATION()");
         if(hayErrores) return;
         if(preanalisis.tipo == TipoToken.FUN){
             FUN_DECL();
@@ -40,19 +41,23 @@ public class ASDR implements Parser{
     }
 
     private void FUN_DECL(){
+        System.out.println("FUN_DECL");
         if(hayErrores) return;
         match(TipoToken.FUN);
         FUNCTION();
     }
 
     private void VAR_DECL(){
+        System.out.println("VAR_DECL");
         if(hayErrores) return;
         match(TipoToken.VAR);
         match(TipoToken.IDENTIFIER);
         VAR_INIT();
+        match(TipoToken.SEMICOLON);
     }
 
     private void VAR_INIT(){
+        System.out.println("VAR_INIT");
         if(hayErrores) return;
         if(preanalisis.tipo == TipoToken.EQUAL){
             match(TipoToken.EQUAL);
@@ -61,6 +66,7 @@ public class ASDR implements Parser{
     }
 
     private void STATEMENT(){
+        System.out.println("STATEMENT");
         if(hayErrores) return;
         if(preanalisis.tipo == TipoToken.FOR){
             FOR_STMT();
@@ -80,12 +86,14 @@ public class ASDR implements Parser{
     }
 
     private void EXPR_STMT(){
+        System.out.println("EXPR_STMT");
         if(hayErrores) return;
         EXPRESSION();
         match(TipoToken.SEMICOLON);
     }
 
     private void FOR_STMT(){
+        System.out.println("FOR_STMT");
         if(hayErrores) return;
         match(TipoToken.FOR);
         match(TipoToken.LEFT_PAREN);
@@ -97,6 +105,7 @@ public class ASDR implements Parser{
     }
 
     private void FOR_STMT_1(){
+        System.out.println("FOR_STMT_1");
         if(hayErrores) return;
         if(preanalisis.tipo == TipoToken.VAR){
             VAR_DECL();
@@ -106,8 +115,9 @@ public class ASDR implements Parser{
             EXPR_STMT();
         }else hayErrores = true;
     }
-
+    
     private void FOR_STMT_2(){
+        System.out.println("FOR_STMT_2");
         if(hayErrores) return;
         if(preanalisis.tipo == TipoToken.SEMICOLON){
             match(TipoToken.SEMICOLON);
@@ -116,13 +126,15 @@ public class ASDR implements Parser{
             match(TipoToken.SEMICOLON);
         }else hayErrores = true;
     }
-
+    
     private void FOR_STMT_3(){
+        System.out.println("FOR_STMT_3");
         if(hayErrores) return;
         if(primeroEXPR_STMT(preanalisis.tipo)) EXPRESSION();
     }
 
     private void IF_STMT(){
+        System.out.println("if_STMT");
         if(hayErrores) return;
         match(TipoToken.IF);
         match(TipoToken.LEFT_PAREN);
@@ -133,6 +145,7 @@ public class ASDR implements Parser{
     }
 
     private void ELSE_STATEMENT(){
+        System.out.println("ELSE_STATEMENT");
         if(hayErrores) return;
         if(preanalisis.tipo == TipoToken.ELSE){
             match(TipoToken.ELSE);
@@ -141,12 +154,14 @@ public class ASDR implements Parser{
     }
 
     private void PRINT_STMT(){
+        System.out.println("PRINT_STMT");
         if(hayErrores) return;
         match(TipoToken.PRINT);
         EXPRESSION();
     }
 
     private void RETURN_STMT(){
+        System.out.println("RETURN_STMT");
         if(hayErrores) return;
         match(TipoToken.RETURN);
         RETURN_EXP_OPC();
@@ -154,6 +169,7 @@ public class ASDR implements Parser{
     }
 
     private void RETURN_EXP_OPC(){
+        System.out.println("RETURN_EXP_OPC");
         if(hayErrores) return;
         if(primeroEXPR_STMT(preanalisis.tipo)){
             EXPRESSION();
@@ -161,6 +177,7 @@ public class ASDR implements Parser{
     }
 
     private void WHILE_STMT(){
+        System.out.println("WHILE_STMT");
         if(hayErrores) return;
         match(TipoToken.WHILE);
         match(TipoToken.LEFT_PAREN);
@@ -170,6 +187,7 @@ public class ASDR implements Parser{
     }
 
     private void BLOCK(){
+        System.out.println("BLOCK");
         if(hayErrores) return;
         match(TipoToken.LEFT_BRACE);
         DECLARATION();
@@ -177,32 +195,36 @@ public class ASDR implements Parser{
     }
 
     private void EXPRESSION(){
+        System.out.println("EXPRESSION");
         if(hayErrores) return;
         ASSIGNMENT();
     }
 
     private void ASSIGNMENT(){
+        System.out.println("ASSIGNMENT");
         if(hayErrores) return;
         LOGIC_OR();
         ASSIGNMENT_OPC();
     }
     
     private void ASSIGNMENT_OPC(){
+        System.out.println("ASSIGNMENT_OPC");
         if(hayErrores) return;
         else if(preanalisis.tipo == TipoToken.EQUAL){
             match(TipoToken.EQUAL);
             EXPRESSION();
         }
-        EXPRESSION();
     }
 
     private void LOGIC_OR(){
+        System.out.println("LOGIC_OR");
         if(hayErrores) return;
         LOGIC_AND();
         LOGIC_OR_2();
     }
 
     private void LOGIC_OR_2(){
+        System.out.println("LOGIC_OR_2");
         if(hayErrores) return;
         else if(preanalisis.tipo == TipoToken.OR){
             match(TipoToken.OR);
@@ -212,27 +234,31 @@ public class ASDR implements Parser{
     }
 
     private void LOGIC_AND(){
+        System.out.println("LOGIC_AND");
         if(hayErrores) return;
         EQUALITY();
-        LOGIC_OR_2();
+        LOGIC_AND_2();
     }
-
+    
     private void LOGIC_AND_2(){
+        System.out.println("LOGIC_AND_2");
         if(hayErrores) return;
         else if(preanalisis.tipo == TipoToken.AND){
             match(TipoToken.AND);
             EQUALITY();
-            LOGIC_OR_2();
+            LOGIC_AND_2();
         }
     }
 
     private void EQUALITY(){
+        System.out.println("EQUALITY");
         if(hayErrores) return;
         COMPARISON();
         EQUALITY_2();
     }
 
     private void EQUALITY_2(){
+        System.out.println("EQUALITY_2");
         if(hayErrores) return;
         else if(preanalisis.tipo == TipoToken.BANG_EQUAL){
             match(TipoToken.BANG_EQUAL);
@@ -246,12 +272,14 @@ public class ASDR implements Parser{
     }
 
     private void COMPARISON(){
+        System.out.println("COMPARISON");
         if(hayErrores) return;
         TERM();
         COMPARISON_2();
     }
-
+    
     private void COMPARISON_2(){
+        System.out.println("COMPARISON_2");
         if(hayErrores) return;
         else if(preanalisis.tipo == TipoToken.GREATER){
             match(TipoToken.GREATER);
@@ -273,12 +301,14 @@ public class ASDR implements Parser{
     }
 
     private void TERM(){
+        System.out.println("TERM");
         if(hayErrores) return;
         FACTOR();
         TERM_2();
     }
-
+    
     private void TERM_2(){
+        System.out.println("TERM_2");
         if(hayErrores) return;
         else if(preanalisis.tipo == TipoToken.MINUS){
             match(TipoToken.MINUS);
@@ -292,12 +322,14 @@ public class ASDR implements Parser{
     }
 
     private void FACTOR(){
+        System.out.println("FACTOR");
         if(hayErrores) return;
         UNARY();
         FACTOR_2();
     }
 
     private void FACTOR_2(){
+        System.out.println("FACTOR_2");
         if(hayErrores) return;
         else if(preanalisis.tipo == TipoToken.SLASH){
             match(TipoToken.SLASH);
@@ -311,6 +343,7 @@ public class ASDR implements Parser{
     }
 
     private void UNARY(){
+        System.out.println("UNARY");
         if(hayErrores) return;
         else if(preanalisis.tipo == TipoToken.BANG){
             match(TipoToken.BANG);
@@ -319,27 +352,30 @@ public class ASDR implements Parser{
             match(TipoToken.MINUS);
             UNARY();
         } else {
-            //CALL();
+            CALL();
         }
     }
 
     private void CALL(){
+        System.out.println("CALL");
         if(hayErrores) return;
         PRIMARY();
         CALL_2();
     }
-
+    
     private void CALL_2(){
+        System.out.println("CALL_2");
         if(hayErrores) return;
         else if(preanalisis.tipo == TipoToken.LEFT_PAREN){
             match(TipoToken.LEFT_PAREN);
             ARGUMENTS_OPC();
             match(TipoToken.RIGHT_PAREN);
-            CALL_2();
+            //CALL_2(); No se usa, dicho por el profesor
         }
     }
     
     private void PRIMARY(){
+        System.out.println("PRIMARY");
         if(hayErrores) return;
         else if(preanalisis.tipo == TipoToken.TRUE){
             match(TipoToken.TRUE);
@@ -361,36 +397,37 @@ public class ASDR implements Parser{
     }
     
     private void FUNCTION(){
+        System.out.println("FUNCTION");
         if(hayErrores) return;
         match(TipoToken.IDENTIFIER);
         match(TipoToken.LEFT_PAREN);
         PARAMETERS_OPC();
         match(TipoToken.RIGHT_PAREN);
         BLOCK();
-    }
-
-    private void FUNCTIONS(){
+    } 
+    
+    /*private void FUNCTIONS(){
         if(hayErrores) return;
         else if(preanalisis.tipo == TipoToken.FUN){
             match(TipoToken.FUN);
             FUNCTIONS();
         }
-    }
+    }*/
 
     private void PARAMETERS_OPC(){
+        System.out.println("PARAMETERS_OPC");
         if(hayErrores) return;
-        else if(preanalisis.tipo == TipoToken.IDENTIFIER){
-            match(TipoToken.IDENTIFIER);
-            FUNCTIONS();
-        }
+        PARAMETERS();
     }
-
+    
     private void PARAMETERS(){
+        System.out.println("PARAMETERS");
         match(TipoToken.IDENTIFIER);
         PARAMETERS_2();
     }
-
+    
     private void PARAMETERS_2(){
+        System.out.println("PARAMETERS_2");
         if(hayErrores) return;
         else if(preanalisis.tipo == TipoToken.COMMA){
             match(TipoToken.COMMA);
@@ -398,16 +435,18 @@ public class ASDR implements Parser{
             PARAMETERS_2();
         }
     }
-
+    
     private void ARGUMENTS_OPC(){
+        System.out.println("ARGUMENTS_OPC");
         if(hayErrores) return;
         else if(primeroEXPR_STMT(preanalisis.tipo)){
             EXPRESSION();
             ARGUMENTS();
         }
     }
-
+    
     private void ARGUMENTS(){
+        System.out.println("ARGUMENTS");
         if(hayErrores) return;
         else if(preanalisis.tipo == TipoToken.COMMA){
             match(TipoToken.COMMA);
@@ -419,7 +458,7 @@ public class ASDR implements Parser{
     private void match(TipoToken tt){
         if(preanalisis.tipo == tt){
             i++;
-            preanalisis = tokens.get(i);
+            if(i < tokens.size()) preanalisis = tokens.get(i);
         }else{
             hayErrores = true;
             System.out.println("Error encontrado");
