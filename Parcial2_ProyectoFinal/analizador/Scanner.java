@@ -1,3 +1,4 @@
+package analizador;
 import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.HashMap;
