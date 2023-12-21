@@ -21,4 +21,8 @@ public class Token {
     public String toString() {
         return "<" + tipo + " " + lexema + " " + literal + ">";
     }
+
+    public Object getLiteral(){
+        return this.literal;
+    }
 }

@@ -1,15 +1,12 @@
 package expresiones;
-import analizador.*;
-import java.beans.Expression;
-import java.util.List;
-import java.util.TreeMap;
+import analizador.Token;
 
 public class ExprAssign extends Expresion{
 
     final Token name;
     final Expresion value;
     
-    ExprAssign(Token name, Expresion value){
+    public ExprAssign(Token name, Expresion value){
         this.name = name;
         this.value = value;
     }
