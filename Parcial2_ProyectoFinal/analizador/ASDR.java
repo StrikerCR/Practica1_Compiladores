@@ -219,7 +219,7 @@ public class ASDR implements Parser{
         return asg;
     }
     
-    //ExprAssign necesita un Token, pero tenemos una Expresion (asg)
+    //ExprAssign necesita un Token, pero tenemos una Expresion en su lugar (asg)
     private Expresion ASSIGNMENT_OPC(Expresion asg){
         System.out.println("ASSIGNMENT_OPC");
         if(hayErrores) return null;
@@ -230,88 +230,111 @@ public class ASDR implements Parser{
         }return null;
     }
 
-    private void LOGIC_OR(){
-        System.out.println("LOGIC_OR");
-        if(hayErrores) return;
-        LOGIC_AND();
-        LOGIC_OR_2();
+    private Expresion LOGIC_OR(){
+        //System.out.println("LOGIC_OR");
+        if(hayErrores) return null;
+        Expresion expr = LOGIC_AND();
+        expr = LOGIC_OR_2(expr);
+        return expr;
     }
 
-    private void LOGIC_OR_2(){
-        System.out.println("LOGIC_OR_2");
-        if(hayErrores) return;
+    private Expresion LOGIC_OR_2(Expresion expr){
+        //System.out.println("LOGIC_OR_2");
+        if(hayErrores) return null;
         if(preanalisis.tipo == TipoToken.OR){
             match(TipoToken.OR);
-            LOGIC_AND();
-            LOGIC_OR_2();
-        }
+            Token operador = previous();
+            Expresion expr2 = LOGIC_AND();
+            Expresion expl = new ExprLogical(expr, operador, expr2);
+            return LOGIC_OR_2(expl);
+        }return null;
     }
 
-    private void LOGIC_AND(){
-        System.out.println("LOGIC_AND");
-        if(hayErrores) return;
-        EQUALITY();
-        LOGIC_AND_2();
+    private Expresion LOGIC_AND(){
+        //System.out.println("LOGIC_AND");
+        if(hayErrores) return null;
+        Expresion expr = EQUALITY();
+        expr = LOGIC_AND_2(expr);
+        return expr;
     }
     
-    private void LOGIC_AND_2(){
-        System.out.println("LOGIC_AND_2");
-        if(hayErrores) return;
+    private Expresion LOGIC_AND_2(Expresion expr){
+        //System.out.println("LOGIC_AND_2");
+        if(hayErrores) return null;
         if(preanalisis.tipo == TipoToken.AND){
             match(TipoToken.AND);
-            EQUALITY();
-            LOGIC_AND_2();
+            Token operador = previous();
+            Expresion expr2 = EQUALITY();
+            Expresion expl = new ExprLogical(expr, operador, expr2);
+            return LOGIC_AND_2(expl);
         }
+        return null;
     }
 
-    private void EQUALITY(){
-        System.out.println("EQUALITY");
-        if(hayErrores) return;
-        COMPARISON();
-        EQUALITY_2();
+    private Expresion EQUALITY(){
+        //System.out.println("EQUALITY");
+        if(hayErrores) return null;
+        Expresion expr = COMPARISON();
+        expr = EQUALITY_2(expr);
+        return expr;
     }
 
-    private void EQUALITY_2(){
-        System.out.println("EQUALITY_2");
-        if(hayErrores) return;
+    private Expresion EQUALITY_2(Expresion expr){
+        //System.out.println("EQUALITY_2");
+        if(hayErrores) return null;
         if(preanalisis.tipo == TipoToken.BANG_EQUAL){
             match(TipoToken.BANG_EQUAL);
-            COMPARISON();
-            EQUALITY_2();
+            Token operador = previous();
+            Expresion expr2 = COMPARISON();
+            Expresion expb = new ExprBinary(expr, operador, expr2);
+            return EQUALITY_2(expb);
         } else if(preanalisis.tipo == TipoToken.EQUAL_EQUAL){
             match(TipoToken.EQUAL_EQUAL);
-            COMPARISON();
-            EQUALITY_2();
-        }
+            Token operador = previous();
+            Expresion expr2 = COMPARISON();
+            Expresion expb = new ExprBinary(expr, operador, expr2);
+            return EQUALITY_2(expb);
+        }return null;
     }
 
-    private void COMPARISON(){
+    //Incompleta por TERM
+    private Expresion COMPARISON(){
         System.out.println("COMPARISON");
-        if(hayErrores) return;
-        TERM();
-        COMPARISON_2();
+        if(hayErrores) return null;
+        Expresion expr = TERM();
+        expr = COMPARISON_2(expr);
+        return expr;
     }
     
-    private void COMPARISON_2(){
+    //Incompleta por TERM
+    private Expresion COMPARISON_2(Expresion expr){
         System.out.println("COMPARISON_2");
-        if(hayErrores) return;
+        if(hayErrores) return null;
         if(preanalisis.tipo == TipoToken.GREATER){
             match(TipoToken.GREATER);
-            TERM();
-            COMPARISON_2();
+            Token operador = previous();
+            Expresion expr2 = TERM();
+            Expresion expb = new ExprBinary(expr, operador, expr2);
+            return COMPARISON_2(expb);
         } else if(preanalisis.tipo == TipoToken.GREATER_EQUAL){
             match(TipoToken.GREATER_EQUAL);
-            TERM();
-            COMPARISON_2();
+            Token operador = previous();
+            Expresion expr2 = TERM();
+            Expresion expb = new ExprBinary(expr, operador, expr2);
+            return COMPARISON_2(expb);
         } else if(preanalisis.tipo == TipoToken.LESS){
             match(TipoToken.LESS);
-            TERM();
-            COMPARISON_2();
+            Token operador = previous();
+            Expresion expr2 = TERM();
+            Expresion expb = new ExprBinary(expr, operador, expr2);
+            return COMPARISON_2(expb);
         } else if(preanalisis.tipo == TipoToken.LESS_EQUAL){
             match(TipoToken.LESS_EQUAL);
-            TERM();
-            COMPARISON_2();
-        }
+            Token operador = previous();
+            Expresion expr2 = TERM();
+            Expresion expb = new ExprBinary(expr, operador, expr2);
+            return COMPARISON_2(expb);
+        }return null;
     }
 
     private void TERM(){
