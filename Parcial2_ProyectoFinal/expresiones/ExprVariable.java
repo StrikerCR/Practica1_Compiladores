@@ -1,13 +1,10 @@
 package expresiones;
 import analizador.*;
-import java.beans.Expression;
-import java.util.List;
-import java.util.TreeMap;
 
-class ExprVariable extends Expresion {
+public class ExprVariable extends Expresion {
     final Token name;
 
-    ExprVariable(Token name) {
+    public ExprVariable(Token name) {
         this.name = name;
     }
 

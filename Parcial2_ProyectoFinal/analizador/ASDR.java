@@ -1,5 +1,8 @@
 package analizador;
+import java.beans.Expression;
+import java.util.ArrayList;
 import java.util.List;
+import expresiones.*;
 
 public class ASDR implements Parser{
     private int i = 0;
@@ -201,26 +204,30 @@ public class ASDR implements Parser{
         match(TipoToken.RIGHT_BRACE);
     }
 
-    private void EXPRESSION(){
-        System.out.println("EXPRESSION");
-        if(hayErrores) return;
-        ASSIGNMENT();
+    private Expresion EXPRESSION(){
+        //System.out.println("EXPRESSION");
+        if(hayErrores) return null;
+        return ASSIGNMENT();
     }
 
-    private void ASSIGNMENT(){
+    //Incompleta por ASSIGNMENT_OPC
+    private Expresion ASSIGNMENT(){
         System.out.println("ASSIGNMENT");
-        if(hayErrores) return;
-        LOGIC_OR();
-        ASSIGNMENT_OPC();
+        if(hayErrores) return null;
+        Expresion asg = LOGIC_OR();
+        asg = ASSIGNMENT_OPC(asg);
+        return asg;
     }
     
-    private void ASSIGNMENT_OPC(){
+    //ExprAssign necesita un Token, pero tenemos una Expresion (asg)
+    private Expresion ASSIGNMENT_OPC(Expresion asg){
         System.out.println("ASSIGNMENT_OPC");
-        if(hayErrores) return;
+        if(hayErrores) return null;
         if(preanalisis.tipo == TipoToken.EQUAL){
             match(TipoToken.EQUAL);
-            EXPRESSION();
-        }
+            Expresion val = EXPRESSION();
+            return new ExprAssign(asg, val);
+        }return null;
     }
 
     private void LOGIC_OR(){
@@ -328,79 +335,101 @@ public class ASDR implements Parser{
         }
     }
 
-    private void FACTOR(){
+    private Expresion FACTOR(){
         System.out.println("FACTOR");
-        if(hayErrores) return;
-        UNARY();
-        FACTOR_2();
+        if(hayErrores) return null;
+        Expresion expr = UNARY();
+        expr = FACTOR_2(expr);
+        return expr;
     }
 
-    private void FACTOR_2(){
-        System.out.println("FACTOR_2");
-        if(hayErrores) return;
+    private Expresion FACTOR_2(Expresion expr){
+        //System.out.println("FACTOR_2");
+        if(hayErrores) return null;
         if(preanalisis.tipo == TipoToken.SLASH){
             match(TipoToken.SLASH);
-            UNARY();
-            FACTOR_2();
+            Token operador = previous();
+            Expresion expr2 = UNARY();
+            ExprBinary expb = new ExprBinary(expr, operador, expr2);
+            return FACTOR_2(expb);
         } else if(preanalisis.tipo == TipoToken.STAR){
             match(TipoToken.STAR);
-            UNARY();
-            FACTOR_2();
-        }
+            Token operador = previous();
+            Expresion expr2 = UNARY();
+            ExprBinary expb = new ExprBinary(expr, operador, expr2);
+            return FACTOR_2(expb);
+        }return null;
     }
 
-    private void UNARY(){
-        System.out.println("UNARY");
-        if(hayErrores) return;
+    private Expresion UNARY(){
+        //System.out.println("UNARY");
+        if(hayErrores) return null;
         if(preanalisis.tipo == TipoToken.BANG){
             match(TipoToken.BANG);
-            UNARY();
+            Token operador = previous();
+            Expresion expr = UNARY();
+            return new ExprUnary(operador, expr);
         } else if(preanalisis.tipo == TipoToken.MINUS){
             match(TipoToken.MINUS);
-            UNARY();
+            Token operador = previous();
+            Expresion expr = UNARY();
+            return new ExprUnary(operador, expr);
         } else {
-            CALL();
+            return CALL();
         }
     }
 
-    private void CALL(){
-        System.out.println("CALL");
-        if(hayErrores) return;
-        PRIMARY();
-        CALL_2();
+    private Expresion CALL(){
+        //System.out.println("CALL");
+        if(hayErrores) return null;
+        Expresion expr = PRIMARY();
+        expr = CALL_2(expr);
+        return expr;
     }
     
-    private void CALL_2(){
-        System.out.println("CALL_2");
-        if(hayErrores) return;
+    private Expresion CALL_2(Expresion expr){
+        //System.out.println("CALL_2");
+        if(hayErrores) return null;
         if(preanalisis.tipo == TipoToken.LEFT_PAREN){
             match(TipoToken.LEFT_PAREN);
-            ARGUMENTS_OPC();
+            List<Expresion> lstArguments = ARGUMENTS_OPC();
             match(TipoToken.RIGHT_PAREN);
             //CALL_2(); No se usa, dicho por el profesor
-        }
+            ExprCallFunction ecf = new ExprCallFunction(expr, lstArguments);
+            return CALL_2(ecf);
+        } return null;
     }
     
-    private void PRIMARY(){
-        System.out.println("PRIMARY");
-        if(hayErrores) return;
+    private Expresion PRIMARY(){
+        //System.out.println("PRIMARY");
+        if(hayErrores) return null;
         if(preanalisis.tipo == TipoToken.TRUE){
             match(TipoToken.TRUE);
+            return new ExprLiteral(true);
         } else if(preanalisis.tipo == TipoToken.FALSE){
             match(TipoToken.FALSE);
+            return new ExprLiteral(false);
         } else if(preanalisis.tipo == TipoToken.NULL){
             match(TipoToken.NULL);
+            return new ExprLiteral(null);
         } else if(preanalisis.tipo == TipoToken.NUMBER){
             match(TipoToken.NUMBER);
+            Token numero = previous();
+            return new ExprLiteral(numero.getLiteral());
         } else if(preanalisis.tipo == TipoToken.STRING){
             match(TipoToken.STRING);
+            Token cadena = previous();
+            return new ExprLiteral(cadena.getLiteral());
         } else if(preanalisis.tipo == TipoToken.IDENTIFIER){
             match(TipoToken.IDENTIFIER);
+            Token id = previous();
+            return new ExprVariable(id);
         } else if(preanalisis.tipo == TipoToken.LEFT_PAREN){
             match(TipoToken.LEFT_PAREN);
-            EXPRESSION();
+            Expresion expr = EXPRESSION();
             match(TipoToken.RIGHT_PAREN);
-        }
+            return new ExprGrouping(expr);
+        }return null;
     }
     
     private void FUNCTION(){
@@ -445,23 +474,27 @@ public class ASDR implements Parser{
         }
     }
     
-    private void ARGUMENTS_OPC(){
-        System.out.println("ARGUMENTS_OPC");
-        if(hayErrores) return;
+    private List<Expresion> ARGUMENTS_OPC(){
+        //System.out.println("ARGUMENTS_OPC");
+        if(hayErrores) return null;
         if(primeroEXPR_STMT(preanalisis.tipo)){
-            EXPRESSION();
-            ARGUMENTS();
-        }
+            List<Expresion> lstArguments =  new ArrayList<Expresion>();
+            lstArguments.add(EXPRESSION());
+            lstArguments.addAll(ARGUMENTS());
+            return lstArguments;
+        } return null;
     }
     
-    private void ARGUMENTS(){
-        System.out.println("ARGUMENTS");
-        if(hayErrores) return;
+    private List<Expresion> ARGUMENTS(){
+        //System.out.println("ARGUMENTS");
+        if(hayErrores) return null;
         if(preanalisis.tipo == TipoToken.COMMA){
+            List<Expresion> lstArguments =  new ArrayList<Expresion>();
             match(TipoToken.COMMA);
-            EXPRESSION();
-            ARGUMENTS();
-        }
+            lstArguments.add(EXPRESSION());
+            lstArguments.addAll(ARGUMENTS());
+            return lstArguments;
+        }return null;
     }
 
     private void match(TipoToken tt){
@@ -472,6 +505,10 @@ public class ASDR implements Parser{
             hayErrores = true;
             System.out.println("Error encontrado, no se tiene "+tt);
         }
+    }
+
+    private Token previous() {
+        return this.tokens.get(i - 1);
     }
 
     private boolean primeroSTATEMENT(TipoToken tt){
