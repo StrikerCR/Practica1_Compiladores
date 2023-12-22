@@ -1,5 +1,5 @@
 package expresiones;
-import analizador.Token;
+import analizador.*;
 
 public class ExprAssign extends Expresion{
 
