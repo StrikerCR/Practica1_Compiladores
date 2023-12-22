@@ -1,5 +1,6 @@
 package analizador;
 import java.beans.Expression;
+import java.beans.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import expresiones.*;
@@ -31,93 +32,113 @@ public class ASDR implements Parser{
     }
 
     private void PROGRAM(){
-        DECLARATION();
+        ArrayList<Expresion> statements = new ArrayList<>();
+        DECLARATION(statements);
     }
 
-    private void DECLARATION(){
+    private ArrayList DECLARATION(ArrayList statements){
         System.out.println("DECLARATION");
-        if(hayErrores) return;
+        if(hayErrores) return null;
         if(preanalisis.tipo == TipoToken.FUN){
-            FUN_DECL();
-            DECLARATION();
+            Expresion fundcl = FUN_DECL();
+            statements.add(fundcl);
+            DECLARATION(statements);
         }else if(preanalisis.tipo == TipoToken.VAR){
-            VAR_DECL();
-            DECLARATION();
+            Expresion vardcl = VAR_DECL();
+            statements.add(vardcl);
+            DECLARATION(statements);
         }else if(primeroSTATEMENT(preanalisis.tipo)){
-            STATEMENT();
-            DECLARATION();
-        }
+            Expresion stmt = STATEMENT();
+            statements.add(stmt);
+            DECLARATION(statements);
+        } return statements;
     }
 
-    private void FUN_DECL(){
+    private Expresion FUN_DECL(){
         System.out.println("FUN_DECL");
-        if(hayErrores) return;
+        if(hayErrores) return null;
         match(TipoToken.FUN);
-        FUNCTION();
+        Expresion fun = FUNCTION();
+        return fun;
     }
 
-    private void VAR_DECL(){
+    private Expresion VAR_DECL(){
         System.out.println("VAR_DECL");
-        if(hayErrores) return;
+        if(hayErrores) return null;
         match(TipoToken.VAR);
         match(TipoToken.IDENTIFIER);
-        VAR_INIT();
+        Expresion name = previous();
+        Expresion initializer = VAR_INIT();
         match(TipoToken.SEMICOLON);
+        Expresion pc = previous();
+        Expresion stmtv = StmtVar(name, str(initializer));
+        return stmtv;
     }
 
-    private void VAR_INIT(){
+    private Expresion VAR_INIT(){
         System.out.println("VAR_INIT");
-        if(hayErrores) return;
+        if(hayErrores) return null;
         if(preanalisis.tipo == TipoToken.EQUAL){
             match(TipoToken.EQUAL);
-            EXPRESSION();
+            Expresion initializer = EXPRESSION();
+            return initializer;
         }
     }
 
-    private void STATEMENT(){
+    private Expresion STATEMENT(){
         System.out.println("STATEMENT");
-        if(hayErrores) return;
+        if(hayErrores) return null;
         if(preanalisis.tipo == TipoToken.FOR){
-            FOR_STMT();
+            return FOR_STMT();
         }else if(preanalisis.tipo == TipoToken.IF){
-            IF_STMT();
+            return IF_STMT();
         }else if(preanalisis.tipo == TipoToken.PRINT){
-            PRINT_STMT();
+            return PRINT_STMT();
         }else if(preanalisis.tipo == TipoToken.RETURN){
-            RETURN_STMT();
+            Expresion value = RETURN_STMT();
+            return value;
         }else if(preanalisis.tipo == TipoToken.WHILE){
-            WHILE_STMT();
+            return WHILE_STMT();
         }else if(preanalisis.tipo == TipoToken.LEFT_BRACE){
-            BLOCK();
+            return BLOCK();
         }else if(primeroEXPR_STMT(preanalisis.tipo)){
-            EXPR_STMT();
+            return EXPR_STMT();
         }else hayErrores = true;
     }
 
     private void EXPR_STMT(){
         System.out.println("EXPR_STMT");
         if(hayErrores) return;
-        EXPRESSION();
+        Expresion expression = EXPRESSION();
         match(TipoToken.SEMICOLON);
+        return StmtExpression(expression);
     }
 
-    private void FOR_STMT(){
+    private Expresion FOR_STMT(){
         System.out.println("FOR_STMT");
         if(hayErrores) return;
         match(TipoToken.FOR);
         match(TipoToken.LEFT_PAREN);
-        FOR_STMT_1();
-        FOR_STMT_2();
-        FOR_STMT_3();
+        Expresion initializer = FOR_STMT_1();
+        Expresion condition = FOR_STMT_2();
+        Expresion increment = FOR_STMT_3();
         match(TipoToken.RIGHT_PAREN);
-        STATEMENT();
+        Expresion body = STATEMENT();
+        if(increment != null){
+            body = StmtBlock(body, StmtExpression(increment));
+        } else if(condition != null){
+            condition = ExprLiteral(true);
+            body = StmtLoop(condition, body);
+        } if(initializer != null){
+            body = StmtBlock(initializer, body);
+        } return body;
     }
 
     private void FOR_STMT_1(){
         System.out.println("FOR_STMT_1");
         if(hayErrores) return;
         if(preanalisis.tipo == TipoToken.VAR){
-            VAR_DECL();
+            return VAR_DECL();
         }else if(preanalisis.tipo == TipoToken.SEMICOLON){
             match(TipoToken.SEMICOLON);
         }else if(primeroEXPR_STMT(preanalisis.tipo)){
@@ -334,28 +355,33 @@ public class ASDR implements Parser{
             Expresion expr2 = TERM();
             Expresion expb = new ExprBinary(expr, operador, expr2);
             return COMPARISON_2(expb);
-        }return null;
+        } return expr;
     }
 
-    private void TERM(){
+    private Expresion TERM(){
         System.out.println("TERM");
-        if(hayErrores) return;
-        FACTOR();
-        TERM_2();
+        if(hayErrores) return null;
+        Expresion expr = FACTOR();
+        expr = TERM_2(expr);
+        return expr;
     }
     
-    private void TERM_2(){
+    private Expresion TERM_2(Expresion expr){
         System.out.println("TERM_2");
-        if(hayErrores) return;
+        if(hayErrores) return null;
         if(preanalisis.tipo == TipoToken.MINUS){
             match(TipoToken.MINUS);
-            FACTOR();
-            TERM_2();
+            Token operador = previous();
+            Expresion expr2 = FACTOR();
+            Expresion expb = new ExprBinary(expr, operador, expr2);
+            return TERM_2(expb);
         } else if(preanalisis.tipo == TipoToken.PLUS){
             match(TipoToken.PLUS);
-            FACTOR();
-            TERM_2();
-        }
+            Token operador = previous();
+            Expresion expr2 = FACTOR();
+            Expresion expb = new ExprBinary(expr, operador, expr2);
+            return TERM_2(expb);
+        } return null;
     }
 
     private Expresion FACTOR(){
